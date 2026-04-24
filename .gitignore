@@ -1,0 +1,13 @@
+# 编译产物
+/server
+/server.exe
+/backend
+/backend.exe
+*.exe
+
+# 数据库（生产环境数据不应提交）
+data/*.db
+*.db
+
+# Go 相关
+/vendor/
