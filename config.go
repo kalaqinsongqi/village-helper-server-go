@@ -32,5 +32,9 @@ func ensureDataDir() {
 }
 
 func getDSN() string {
-	return fmt.Sprintf("%s?_fk=1", cfg.DBPath)
+	dbPath := cfg.DBPath
+	if envPath := os.Getenv("DB_PATH"); envPath != "" {
+		dbPath = envPath
+	}
+	return fmt.Sprintf("%s?_fk=1", dbPath)
 }
