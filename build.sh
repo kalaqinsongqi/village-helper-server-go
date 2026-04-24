@@ -52,7 +52,7 @@ echo "   ✅ 前端构建完成"
 # 4. 打包 Windows 安装包
 echo ""
 echo "📦 步骤 4/4: 打包 Windows 安装包..."
-npx electron-builder --win
+npx electron-builder --win --x64
 echo "   ✅ 打包完成"
 
 # 输出结果
