@@ -1,0 +1,62 @@
+# .github/workflows/build.yml
+name: Build Windows App
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      # 1. 检出后端代码
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          path: server-go
+
+      # 2. 检出前端代码
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+        with:
+          repository: kalaqinsongqi/village-helper-desk-app
+          path: desk-app
+
+      # 3. 编译 Go 后端（交叉编译 Windows）
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build Go backend
+        run: |
+          cd server-go
+          go mod tidy
+          go build -o backend.exe .
+
+      # 4. 复制后端 exe 到前端项目
+      - name: Copy backend to frontend
+        run: |
+          mkdir -p desk-app/resources/server/data
+          cp server-go/backend.exe desk-app/resources/server/
+          cp server-go/data/app.db desk-app/resources/server/data/
+
+      # 5. 打包 Electron 前端
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Electron app
+        run: |
+          cd desk-app
+          npm install
+          npm run build
+          npx electron-builder --win
+
+      # 6. 上传最终安装包
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Village-Helper-Setup
+          path: desk-app/dist/*.exe
